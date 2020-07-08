@@ -94,7 +94,7 @@ module Effective
         elsif datatables_inline_request?
           load_filter_params!
         else
-          load_cookie!
+          load_cookie! # but not state.
           load_cookie_state! if cookie.present? && cookie[:params] == cookie_state_params
           load_filter_params!
         end
@@ -102,6 +102,9 @@ module Effective
         fill_empty_filters!
       end
 
+      # This gets hit whenever a page is setting state values based on user-input
+      # This is ONLY called via :load_state!
+      # and ONLY called when this is an ajax request, NOT initial page load!
       def load_ajax_state!
         state[:length] = params[:length].to_i
 
@@ -170,6 +173,13 @@ module Effective
           columns.each do |name, opts|
             next unless opts[:search].kind_of?(Hash) && opts[:search].key?(:value)
             state[:search][name] = opts[:search][:value]
+          end
+        end
+
+        if !datatables_ajax_request? && cookie.blank?
+          columns.each do |name, opts|
+            next unless opts[:search].kind_of?(Hash) && opts[:search].key?(:initial_value)
+            state[:search][name] = opts[:search][:initial_value]
           end
         end
 

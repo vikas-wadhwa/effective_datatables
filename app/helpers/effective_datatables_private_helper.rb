@@ -139,7 +139,7 @@ module EffectiveDatatablesPrivateHelper
       form.input name, label: false, required: false, value: value,
         as: (ActionView::Helpers::FormBuilder.instance_methods.include?(:effective_select) ? :effective_select : :select),
         collection: collection,
-        selected: opts[:search][:value],
+        selected: value || opts[:search][:value],
         multiple: opts[:search][:multiple],
         grouped: opts[:search][:grouped],
         polymorphic: opts[:search][:polymorphic],
